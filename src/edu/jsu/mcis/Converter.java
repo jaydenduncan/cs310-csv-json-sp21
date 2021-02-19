@@ -59,7 +59,7 @@ public class Converter {
     @SuppressWarnings("unchecked")
     public static String csvToJson(String csvString) {
         
-        String results = "";
+        String results;
         
         try {
             
@@ -68,23 +68,51 @@ public class Converter {
             Iterator<String[]> iterator = full.iterator();
             
             // INSERT YOUR CODE HERE
-            String[] headings = iterator.next();
+            String[] csvColHeaders = iterator.next();
+            String[] headings = {"rowHeaders", "data", "colHeaders"};
             
             JSONArray records = new JSONArray();
-            LinkedHashMap<String, String> jsonObject;
+            LinkedHashMap<String, Object> jsonObject = new LinkedHashMap<>();
             String[] record;
+            ArrayList<String> rowHeaders = new ArrayList<>();
+            ArrayList<ArrayList> data = new ArrayList<>();
+            ArrayList<String> columnHeaders = new ArrayList<>();
             
+            for(String c : csvColHeaders){
+                columnHeaders.add(c);
+            }
+            
+            while(iterator.hasNext()){
+                ArrayList<Integer> scores = new ArrayList<>();
+                record = iterator.next();
+                rowHeaders.add(record[0]);
+                scores.add(Integer.parseInt(record[1]));
+                scores.add(Integer.parseInt(record[2]));
+                scores.add(Integer.parseInt(record[3]));
+                scores.add(Integer.parseInt(record[4]));
+                data.add(scores);
+            }
+            
+            jsonObject.put(headings[0], rowHeaders);
+            jsonObject.put(headings[1], data);
+            jsonObject.put(headings[2], columnHeaders);
+            
+            //records.add(jsonObject);
+            
+            
+            /*
             while(iterator.hasNext()){
                 record = iterator.next();
                 jsonObject = new LinkedHashMap<>();
-                for(int i=0; i<headings.length; i++){
-                    jsonObject.put(headings[i], record[i]);
+                for(int i = 0; i < headings.length; i++){
+                    jsonObject.put(headings[i], Integer.parseInt(record[i]));
                 }
                 
                 records.add(jsonObject);
             }
+            */
             
-            results = JSONValue.toJSONString(records);
+            results = JSONValue.toJSONString(jsonObject);
         }        
         catch(Exception e) { return e.toString(); }
         
@@ -94,7 +122,7 @@ public class Converter {
     
     public static String jsonToCsv(String jsonString) {
         
-        String results = "";
+        String results;
         
         try {
 
